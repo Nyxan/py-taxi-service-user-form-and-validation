@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from .forms import DriverCreateForm, DriverLicenseUpdateForm, CarForm
 from .models import Driver, Car, Manufacturer
 
 
@@ -64,14 +65,12 @@ class CarDetailView(LoginRequiredMixin, generic.DetailView):
 
 class CarCreateView(LoginRequiredMixin, generic.CreateView):
     model = Car
-    fields = "__all__"
-    success_url = reverse_lazy("taxi:car-list")
+    form_class = CarForm
 
 
 class CarUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Car
-    fields = "__all__"
-    success_url = reverse_lazy("taxi:car-list")
+    form_class = CarForm
 
 
 class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -87,3 +86,36 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
     model = Driver
     queryset = Driver.objects.all().prefetch_related("cars__manufacturer")
+
+
+class DriverCreate(LoginRequiredMixin, generic.CreateView):
+    form_class = DriverCreateForm
+    model = Driver
+
+
+class DriverLicenseUpdateForm(LoginRequiredMixin, generic.UpdateView):
+    form_class = DriverLicenseUpdateForm
+    model = Driver
+
+
+class DriverDelete(LoginRequiredMixin, generic.DeleteView):
+    model = Driver
+    success_url = reverse_lazy("taxi:car-list")
+
+
+@login_required
+def add_driver(request, car_id):
+    car = Car.objects.get(pk=car_id)
+    if request.method == "POST":
+        car.drivers.add(request.user)
+        return redirect("taxi:car-detail", pk=car_id)
+    return redirect("taxi:car-detail", pk=car_id)
+
+
+@login_required
+def remove_driver(request, car_id):
+    car = Car.objects.get(pk=car_id)
+    if request.method == "POST":
+        car.drivers.remove(request.user)
+        return redirect("taxi:car-detail", pk=car_id)
+    return redirect("taxi:car-detail", pk=car_id)
