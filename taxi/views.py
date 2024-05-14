@@ -114,4 +114,7 @@ class ManageDriverView(LoginRequiredMixin, generic.ListView):
             driver.cars.remove(car_id)
         else:
             driver.cars.add(car_id)
-        return HttpResponseRedirect(reverse_lazy("taxi:car-detail", args=[car_id]))
+        return HttpResponseRedirect(reverse_lazy(
+            "taxi:car-detail",
+            args=[car_id])
+        )
