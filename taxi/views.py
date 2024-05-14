@@ -100,22 +100,13 @@ class DriverLicenseUpdateForm(LoginRequiredMixin, generic.UpdateView):
 
 class DriverDelete(LoginRequiredMixin, generic.DeleteView):
     model = Driver
-    success_url = reverse_lazy("taxi:car-list")
+    success_url = reverse_lazy("taxi:driver-list")
 
 
 @login_required
-def add_driver(request, car_id):
+def add_and_remove_driver(request, car_id):
     car = Car.objects.get(pk=car_id)
     if request.method == "POST":
         car.drivers.add(request.user)
-        return redirect("taxi:car-detail", pk=car_id)
-    return redirect("taxi:car-detail", pk=car_id)
-
-
-@login_required
-def remove_driver(request, car_id):
-    car = Car.objects.get(pk=car_id)
-    if request.method == "POST":
-        car.drivers.remove(request.user)
         return redirect("taxi:car-detail", pk=car_id)
     return redirect("taxi:car-detail", pk=car_id)
