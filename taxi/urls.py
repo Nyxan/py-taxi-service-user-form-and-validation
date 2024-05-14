@@ -59,7 +59,7 @@ urlpatterns = [
     path("drivers/<int:pk>/delete/",
          DriverDelete.as_view(),
          name="driver-delete"),
-    path("car/<int:car_id>/add-driver/", add_and_remove_driver, name="add-driver"),
+    path("car/<int:car_id>/add-driver/", add_and_remove_driver, name="add-remove-driver"),
 ]
 
 app_name = "taxi"
